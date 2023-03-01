@@ -1,5 +1,8 @@
-require(`dotenv`).config();
 const path = require(`path`);
+require(`dotenv`).config({path: path.join(__dirname, `/.env`)});
+if(!process.env.DB_NAME || !process.env.DB_PASS || !process.env.DB_HOST) {
+	throw Error(`Environment variables missing!`);
+}
 const express = require(`express`);
 const exphbs = require(`express-handlebars`);
 const Sequelize = require(`sequelize`);
