@@ -1,0 +1,107 @@
+<h1>Persons</h1>
+<div class="btn-group d-flex mb-3">
+	<button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addPerson">Add Person
+	</button>
+	<button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#updatePerson">Update Person
+	</button>
+	<button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#deletePerson">Delete Person
+	</button>
+</div>
+<div class="accordion mb-3" id="forms">
+	<div class="collapse" id="addPerson" data-bs-parent="#forms">
+		<form action="/addPerson" method="post">
+			<h2>Add Person</h2>
+			<div class="row align-items-end">
+				<div class="col mb-3">
+					<label for="firstName">First Name</label>
+					<input type="text" name="firstName" class="form-control" pattern="([A-z]|'|-)+" required />
+				</div>
+				<div class="col mb-3">
+					<label for="lastName">Last Name</label>
+					<input type="text" name="lastName" class="form-control" pattern="([A-z]|'|-)+" required />
+				</div>
+				<div class="col-3 mb-3">
+					<label for="age">Age</label>
+					<input type="number" name="age" class="form-control" min="0" required />
+				</div>
+			</div>
+			<div class="row justify-content-end">
+				<div class="col-5 mb-3 d-grid">
+					<button type="submit" class="btn btn-primary">Add</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="collapse" id="updatePerson" data-bs-parent="#forms">
+		<form action="/updatePerson" method="post">
+			<h2>Update Person</h2>
+			<div class="row justify-content-end align-items-end">
+				<div class="col-7 mb-3">
+					<label for="id">ID</label>
+					<input type="number" name="id" class="form-control" min="1" required />
+				</div>
+				<div class="col-5 mb-3 d-grid">
+					<button type="submit" class="btn btn-primary">Update</button>
+				</div>
+			</div>
+			<div class="row align-items-end">
+				<div class="col mb-3">
+					<label for="firstName">First Name</label>
+					<input type="text" name="firstName" class="form-control" pattern="([A-z]|')+" />
+				</div>
+				<div class="col mb-3">
+					<label for="lastName">Last Name</label>
+					<input type="text" name="lastName" class="form-control" pattern="([A-z]|')+" />
+				</div>
+				<div class="col-3 mb-3">
+					<label for="age">Age</label>
+					<input type="number" name="age" class="form-control" min="0" />
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="collapse" id="deletePerson" data-bs-parent="#forms">
+		<form action="/deletePerson" method="post">
+			<h3>Delete Person</h3>
+			<div class="row align-items-end">
+				<div class="col-7 mb-3">
+					<label for="id">ID</label>
+					<input type="number" name="id" class="form-control" min="1" required />
+				</div>
+				<div class="col-5 mb-3 d-grid">
+					<button type="submit" class="btn btn-primary">Delete</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="card mb-3">
+	<div class="table-responsive">
+		<table class="table mb-0">
+			<thead>
+				<th scope="col">ID</th>
+				<th scope="col">First Name</th>
+				<th scope="col">Last Name</th>
+				<th scope="col">Age</th>
+			</thead>
+			<tbody>
+				{{#each data}}
+					<tr>
+						<th scope="row">{{id}}</th>
+						<td>{{firstName}}</td>
+						<td>{{lastName}}</td>
+						<td>{{age}}</td>
+					</tr>
+				{{else}}
+					<tr>
+						<th scope="row">Error</th>
+						<td colspan="4">No persons available. Try adding one!</td>
+					</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+</div>
+{{#if showReturnToTop}}
+	<a href="#top"><button type="button" class="btn btn-outline-dark">Return to top</button></a>
+{{/if}}
