@@ -36,6 +36,9 @@ let Person = sequelize.define(`Person`, {
 
 const errIDLessThanOne = `ID must be greater than zero.`;
 const errIDNotFound = `A person with this ID does not exist.`;
+function capitalizeFirstLetter(string) {
+	return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 app.get(`/`, (req, res) => {
 	let sort = req.query.sort || [`id`, `DESC`];
@@ -58,8 +61,8 @@ app.get(`/`, (req, res) => {
 app.post(`/addPerson`, (req, res) => {
 	if (/([A-z]|'|-)+/.test(req.body.firstName) && /([A-z]|'|-)+/.test(req.body.lastName) && req.body.age > 0) {
 		Person.create({
-			firstName: req.body.firstName,
-			lastName: req.body.lastName,
+			firstName: capitalizeFirstLetter(req.body.firstName),
+			lastName: capitalizeFirstLetter(req.body.lastName),
 			age: req.body.age,
 		}).then((newPerson) => {
 			console.log(`Successfully added person #${newPerson.id}`);
@@ -81,10 +84,10 @@ app.post(`/updatePerson`, (req, res) => {
 				person = found;
 				if (person !== null) {
 					if (/([A-z]|'|-)+/.test(req.body.firstName)) {
-						Person.update({ firstName: req.body.firstName }, { where: { id: req.body.id } }).then(resolve);
+						Person.update({ firstName: capitalizeFirstLetter(req.body.firstName) }, { where: { id: req.body.id } }).then(resolve);
 					}
 					if (/([A-z]|'|-)+/.test(req.body.lastName)) {
-						Person.update({ lastName: req.body.lastName }, { where: { id: req.body.id } }).then(resolve);
+						Person.update({ lastName: capitalizeFirstLetter(req.body.lastName) }, { where: { id: req.body.id } }).then(resolve);
 					}
 					if (req.body.age > 0) {
 						Person.update({ age: req.body.age }, { where: { id: req.body.id } }).then(resolve);
