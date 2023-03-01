@@ -14,5 +14,6 @@ Web application which allows users to add, update, delete, and view employees in
 - PostgreSQL
 
 #### TODO:
+- Add search feature
 - Add columns for: hire date, job, etc.
 - Use date of birth instead of age
