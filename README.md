@@ -3,7 +3,7 @@ Web application which allows users to add, update, delete, and view employees in
 
 ## Sort
 -  Default sorting is ID in descending order. Custom sorting is supported through the `sort` query parameter.
-- Example: `https://usrana-persons.cyclic.app/?sort=age`
+- Example: `https://usrana-persons.cyclic.app/?sort=lastName`
 ***
 #### Tools used:
 - Node
