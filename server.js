@@ -1,16 +1,11 @@
 const path = require(`path`);
-require(`dotenv`).config({path: path.join(__dirname, `/.env`)});
-if(!process.env.DB_NAME || !process.env.DB_PASS || !process.env.DB_HOST) {
+require(`dotenv`).config();
+if (!process.env.DB_NAME || !process.env.DB_PASS || !process.env.DB_HOST) {
 	throw Error(`Environment variables missing!`);
 }
 const express = require(`express`);
 const exphbs = require(`express-handlebars`);
 const Sequelize = require(`sequelize`);
-
-const HTTP_PORT = process.env.PORT || 8080;
-function onHTTPStart() {
-	console.log(`Express HTTP server listening on: ${HTTP_PORT}`);
-}
 
 const app = express();
 app.engine(`.hbs`, exphbs.engine({ extname: `.hbs` }));
@@ -31,11 +26,19 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_NAME, proces
 let Person = sequelize.define(`Person`, {
 	firstName: Sequelize.STRING,
 	lastName: Sequelize.STRING,
-	age: Sequelize.INTEGER,
+	email: Sequelize.STRING,
+	phone: Sequelize.STRING,
+	department: Sequelize.STRING,
 });
 
-const errIDLessThanOne = `ID must be greater than zero.`;
-const errIDNotFound = `A person with this ID does not exist.`;
+const HTTP_PORT = process.env.PORT || 8080;
+const errIDLessThanOne = new Error(`ID must be greater than zero.`);
+const errIDNotFound = new Error(`A person with this ID does not exist.`);
+
+function onHTTPStart() {
+	console.log(`Express HTTP server listening on: ${HTTP_PORT}`);
+}
+
 function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -47,97 +50,118 @@ app.get(`/`, (req, res) => {
 			res.render(`persons`, {
 				data: data,
 				showReturnToTop: data.length > 10,
-				title: `Persons`,
+				title: `Home | Persons`,
 			});
 		})
-		.catch((err) => {
-			console.log(`EXCEPTION: Attempted invalid ORDER BY: ${err}`);
+		.catch((error) => {
+			console.log(`ERROR: ${error}`);
 			res.status(400).render(`error`, {
-				errorMessage: `Sort parameter must be one of the following: id, firstName, lastName, age. Please try again.`,
+				errorMessage: `Sort parameter must be an existing column. Please try again.`,
 			});
 		});
 });
 
-app.post(`/addPerson`, (req, res) => {
-	if (/([A-z]|'|-)+/.test(req.body.firstName) && /([A-z]|'|-)+/.test(req.body.lastName) && req.body.age > 0) {
+app.post(`/add`, (req, res) => {
+	if (
+		/^[A-z'-\s]+$/.test(req.body.firstName) &&
+		/^[A-z'-\s]+$/.test(req.body.lastName) &&
+		/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req.body.email) &&
+		/^\+?\d{0,3}\s?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/.test(req.body.phone) &&
+		/^[A-z\d\s&'-]+$/.test(req.body.department)
+	) {
 		Person.create({
 			firstName: capitalizeFirstLetter(req.body.firstName),
 			lastName: capitalizeFirstLetter(req.body.lastName),
-			age: req.body.age,
+			email: req.body.email,
+			phone: req.body.phone,
+			department: req.body.department,
 		}).then((newPerson) => {
-			console.log(`Successfully added person #${newPerson.id}`);
+			console.log(`Successfully added person #${newPerson.id}: ${newPerson.firstName} ${newPerson.lastName}`);
 			res.redirect(`/`);
 		});
 	} else {
-		console.log(`EXCEPTION: Received invalid values for adding person`);
+		console.log(`ERROR: Received invalid values for adding person`);
 		res.status(403).render(`error`, {
 			errorMessage: `Received invalid values for adding person. Please try again.`,
 		});
 	}
 });
 
-app.post(`/updatePerson`, (req, res) => {
-	return new Promise((resolve, reject) => {
-		if (req.body.id > 0) {
-			let person = null;
-			Person.findByPk(req.body.id).then((found) => {
-				person = found;
-				if (person !== null) {
-					if (/([A-z]|'|-)+/.test(req.body.firstName)) {
-						Person.update({ firstName: capitalizeFirstLetter(req.body.firstName) }, { where: { id: req.body.id } }).then(resolve);
-					}
-					if (/([A-z]|'|-)+/.test(req.body.lastName)) {
-						Person.update({ lastName: capitalizeFirstLetter(req.body.lastName) }, { where: { id: req.body.id } }).then(resolve);
-					}
-					if (req.body.age > 0) {
-						Person.update({ age: req.body.age }, { where: { id: req.body.id } }).then(resolve);
-					}
-				} else {
-					reject(errIDNotFound);
-				}
-			});
-		} else {
-			reject(errIDLessThanOne);
+app.get(`/update`, async (req, res) => {
+	try {
+		// Must use a query because express replaces id parameter
+		// with the string 'style.css' for some reason
+		if (req.query.id < 1) {
+			throw errIDLessThanOne;
 		}
-	})
-		.then(() => {
-			console.log(`Successfully updated person #${req.body.id}`);
-			res.redirect(`/`);
-		})
-		.catch((err) => {
-			console.log(`EXCEPTION: ${err}`);
-			res.status(403).render(`error`, {
-				errorMessage: err,
-			});
-		});
+		let person = await Person.findByPk(req.query.id);
+		if (!person) {
+			throw errIDNotFound;
+		}
+		res.render(`update`, {
+			data: person,
+			title: `Update | Persons`,
+		});	
+	} catch (error) {
+		console.log(`ERROR: ${error}`);
+		res.status(400).render(`error`, { errorMessage: error });
+	}
 });
 
-app.post(`/deletePerson`, (req, res) => {
-	return new Promise((resolve, reject) => {
-		if (req.body.id > 0) {
-			let person = null;
-			Person.findByPk(req.body.id).then((found) => {
-				person = found;
-				if (person !== null) {
-					Person.destroy({ where: { id: req.body.id } }).then(resolve);
-				} else {
-					reject(errIDNotFound);
-				}
-			});
-		} else {
-			reject(errIDLessThanOne);
+app.post(`/update`, async (req, res) => {
+	try {
+		if (req.body.id < 1) {
+			throw errIDLessThanOne;
 		}
-	})
-		.then(() => {
-			console.log(`Succesfully deleted person ${req.body.id}`);
-			res.redirect(`/`);
-		})
-		.catch((err) => {
-			console.log(`EXCEPTION: ${err}`);
-			res.status(403).render(`error`, {
-				errorMessage: err,
-			});
+		let person = await Person.findByPk(req.body.id);
+		if (!person) {
+			throw errIDNotFound;
+		}
+		if (/^[A-z'-\s]+$/.test(req.body.firstName)) {
+			await Person.update({ firstName: capitalizeFirstLetter(req.body.firstName) }, { where: { id: req.body.id } });
+		}
+		if (/^[A-z'-\s]+$/.test(req.body.lastName)) {
+			await Person.update({ lastName: capitalizeFirstLetter(req.body.lastName) }, { where: { id: req.body.id } });
+		}
+		if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req.body.email)) {
+			await Person.update({ email: req.body.email }, { where: { id: req.body.id } });
+		}
+		if (/^\+?\d{1,3}?\s?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/.test(req.body.phone)) {
+			await Person.update({ phone: req.body.phone }, { where: { id: req.body.id } });
+		}
+		if (/^[A-z\d\s&'-]+$/.test(req.body.department)) {
+			await Person.update({ department: req.body.department }, { where: { id: req.body.id } });
+		}
+
+		console.log(`Successfully updated person #${req.body.id}`);
+		res.redirect(`/`);
+	} catch (error) {
+		console.log(`ERROR: ${error}`);
+		res.status(400).render(`error`, { errorMessage: error });
+	}
+});
+
+app.get(`/delete`, async (req, res) => {
+	try {
+		// Must use a query because express replaces id parameter
+		// with the string 'style.css' for some reason
+		if (req.query.id < 1) {
+			throw errIDLessThanOne;
+		}
+		let person = await Person.findByPk(req.query.id);
+		if (!person) {
+			throw errIDNotFound;
+		}
+		await Person.destroy({ where: { id: req.query.id } });
+
+		console.log(`Successfully deleted person ${req.query.id}`);
+		res.redirect(`/`);
+	} catch (error) {
+		console.log(`ERROR: ${error}`);
+		res.status(400).render(`error`, {
+			errorMessage: err,
 		});
+	}
 });
 
 app.use((req, res) => {

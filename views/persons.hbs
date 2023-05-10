@@ -1,75 +1,36 @@
 <h1>Persons</h1>
-<div class="btn-group d-flex mb-3">
-	<button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addPerson">Add Person
+	<button class="btn btn-outline-success" type="button" data-bs-toggle="collapse" data-bs-target="#addPerson">Add Person
 	</button>
-	<button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#updatePerson">Update Person
-	</button>
-	<button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#deletePerson">Delete Person
-	</button>
-</div>
-<div class="accordion mb-3" id="forms">
+<div class="accordion my-3" id="forms">
 	<div class="collapse" id="addPerson" data-bs-parent="#forms">
-		<form action="/addPerson" method="post">
-			<h2>Add Person</h2>
+		<form action="/add" method="post">
 			<div class="row align-items-end">
 				<div class="col mb-3">
 					<label for="firstName">First Name</label>
-					<input type="text" name="firstName" class="form-control" pattern="([A-z]|'|-)+" required />
+					<input type="text" name="firstName" class="form-control" pattern="^[A-z'-\s]+$" required />
 				</div>
 				<div class="col mb-3">
 					<label for="lastName">Last Name</label>
-					<input type="text" name="lastName" class="form-control" pattern="([A-z]|'|-)+" required />
+					<input type="text" name="lastName" class="form-control" pattern="^[A-z'-\s]+$" required />
 				</div>
-				<div class="col-3 mb-3">
-					<label for="age">Age</label>
-					<input type="number" name="age" class="form-control" min="0" required />
+			</div>
+			<div class="row align-items-end">
+				<div class="col mb-3">
+					<label for="email">Email</label>
+					<input type="email" name="email" class="form-control" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required />
+				</div>
+				<div class="col mb-3">
+					<label for="phone">Phone</label>
+					<input type="tel" name="phone" class="form-control" pattern="^\+?\d{0,3}\s?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$" required />
+				</div>
+				<div class="col mb-3">
+					<label for="department">Department</label>
+					<input type="text" name="department" class="form-control" pattern="^[A-z\d\s&'-]+$" required />
 				</div>
 			</div>
 			<div class="row justify-content-end">
-				<div class="col-5 mb-3 d-grid">
+				<div class="col mb-3 d-grid">
 					<button type="submit" class="btn btn-primary">Add</button>
-				</div>
-			</div>
-		</form>
-	</div>
-	<div class="collapse" id="updatePerson" data-bs-parent="#forms">
-		<form action="/updatePerson" method="post">
-			<h2>Update Person</h2>
-			<div class="row justify-content-end align-items-end">
-				<div class="col-7 mb-3">
-					<label for="id">ID</label>
-					<input type="number" name="id" class="form-control" min="1" required />
-				</div>
-				<div class="col-5 mb-3 d-grid">
-					<button type="submit" class="btn btn-primary">Update</button>
-				</div>
-			</div>
-			<div class="row align-items-end">
-				<div class="col mb-3">
-					<label for="firstName">First Name</label>
-					<input type="text" name="firstName" class="form-control" pattern="([A-z]|')+" />
-				</div>
-				<div class="col mb-3">
-					<label for="lastName">Last Name</label>
-					<input type="text" name="lastName" class="form-control" pattern="([A-z]|')+" />
-				</div>
-				<div class="col-3 mb-3">
-					<label for="age">Age</label>
-					<input type="number" name="age" class="form-control" min="0" />
-				</div>
-			</div>
-		</form>
-	</div>
-	<div class="collapse" id="deletePerson" data-bs-parent="#forms">
-		<form action="/deletePerson" method="post">
-			<h3>Delete Person</h3>
-			<div class="row align-items-end">
-				<div class="col-7 mb-3">
-					<label for="id">ID</label>
-					<input type="number" name="id" class="form-control" min="1" required />
-				</div>
-				<div class="col-5 mb-3 d-grid">
-					<button type="submit" class="btn btn-primary">Delete</button>
 				</div>
 			</div>
 		</form>
@@ -78,26 +39,35 @@
 <div class="card mb-3">
 	<div class="table-responsive">
 		<table class="table mb-0">
+			{{#if data}}
 			<thead>
 				<th scope="col">ID</th>
 				<th scope="col">First Name</th>
 				<th scope="col">Last Name</th>
-				<th scope="col">Age</th>
+				<th scope="col">Email</th>
+				<th scope="col">Phone</th>
+				<th scope="col">Department</th>
+				<th scope="col"></th>
+				<th scope="col"></th>
 			</thead>
 			<tbody>
 				{{#each data}}
 					<tr>
-						<th scope="row">{{id}}</th>
-						<td>{{firstName}}</td>
-						<td>{{lastName}}</td>
-						<td>{{age}}</td>
-					</tr>
-				{{else}}
-					<tr>
-						<th scope="row">Error</th>
-						<td colspan="4">No persons available. Try adding one!</td>
+						<th scope="row" class="align-middle">{{id}}</th>
+						<td class="align-middle">{{firstName}}</td>
+						<td class="align-middle">{{lastName}}</td>
+						<td class="align-middle">{{email}}</td>
+						<td class="align-middle">{{phone}}</td>
+						<td class="align-middle">{{department}}</td>
+						<td><a href="/update?id={{id}}"><button class="btn btn-outline-primary">Update</button></a></td>
+						<td><a href="/delete?id={{id}}"><button class="btn btn-outline-danger">Delete</button></a></td>
 					</tr>
 				{{/each}}
+			{{else}}
+					<tr>
+						<td colspan="4">No persons available. Try adding one!</td>
+					</tr>
+			{{/if}}
 			</tbody>
 		</table>
 	</div>

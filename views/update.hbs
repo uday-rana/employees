@@ -1,0 +1,37 @@
+<form action="/update" method="post">
+	<h2>Update Person</h2>
+	<div class="row justify-content-end align-items-end">
+		<div class="col mb-3">
+			<label for="id">ID</label>
+			<input type="number" name="id" class="form-control" min="1" value="{{data.id}}" required disabled/>
+		</div>
+	</div>
+	<div class="row align-items-end">
+		<div class="col mb-3">
+			<label for="firstName">First Name</label>
+			<input type="text" name="firstName" class="form-control" pattern="([A-z]|')+" value="{{data.firstName}}" required/>
+		</div>
+		<div class="col mb-3">
+			<label for="lastName">Last Name</label>
+			<input type="text" name="lastName" class="form-control" pattern="([A-z]|')+" value="{{data.lastName}}" required/>
+		</div>
+	</div>
+    <div class="row align-items-end">
+        <div class="col mb-3">
+            <label for="email">Email</label>
+            <input type="email" name="email" class="form-control" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" value="{{data.email}}" required />
+        </div>
+        <div class="col mb-3">
+            <label for="phone">Phone</label>
+            <input type="tel" name="phone" class="form-control" pattern="^\+?\d{0,3}\s?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$" value="{{data.phone}}" required />
+        </div>
+        <div class="col mb-3">
+            <label for="department">Department</label>
+            <input type="text" name="department" class="form-control" pattern="^[A-z\d\s&'-]+$" value="{{data.department}}" required />
+        </div>
+    </div>
+		<div class="col mb-3 d-grid">
+			<button type="submit" class="btn btn-primary">Update</button>
+		</div>
+</form>
+<a href="/"><button type="button" class="btn btn-outline-dark">Return</button></a>
