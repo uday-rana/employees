@@ -3,7 +3,7 @@ Web application which allows users to add, update, delete, and view employees in
 
 ## Sort
 -  Default sorting is ID in descending order. Custom sorting is supported through the `sort` query parameter. Valid options are: `id`, `firstName`, `lastName`, `age`.
-- Example: `https://https://prickly-fox-windbreaker.cyclic.app/?sort=age`
+- Example: `https://prickly-fox-windbreaker.cyclic.app/?sort=age`
 ***
 #### Tools used:
 - Bootstrap
@@ -14,5 +14,6 @@ Web application which allows users to add, update, delete, and view employees in
 - PostgreSQL
 
 #### TODO:
+- Add search feature
 - Add columns for: hire date, job, etc.
 - Use date of birth instead of age
