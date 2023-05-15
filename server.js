@@ -8,7 +8,21 @@ const exphbs = require(`express-handlebars`);
 const Sequelize = require(`sequelize`);
 
 const app = express();
-app.engine(`.hbs`, exphbs.engine({ extname: `.hbs` }));
+app.engine(
+	`.hbs`,
+	exphbs.engine({
+		extname: `.hbs`,
+		helpers: {
+			navLink: (url, options) => {
+				return (
+					`<li class="nav-item">` +
+					`<a href="${url}" class="nav-link ${url == app.locals.activeRoute ? " active" : ``}">` +
+					`${options.fn(this)}</a></li>`
+				);
+			},
+		},
+	})
+);
 app.set(`view engine`, `.hbs`);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, `/public`)));
@@ -43,7 +57,17 @@ function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-app.get(`/`, (req, res) => {
+app.use((req, res, next) => {
+	let route = req.path.substring(1);
+	app.locals.activeRoute = `/${isNaN(route.split(`/`)[1]) ? route.replace(/\/(?!.*)/, ``) : route.replace(/\/(.*)/, ``)}`;
+	next();
+});
+
+app.get("/", (req, res) => {
+	res.render(`index.hbs`);
+});
+
+app.get(`/persons`, (req, res) => {
 	let sort = req.query.sort || [`id`, `DESC`];
 	Person.findAll({ order: [sort] })
 		.then((data) => {
@@ -77,7 +101,7 @@ app.post(`/add`, (req, res) => {
 			department: req.body.department,
 		}).then((newPerson) => {
 			console.log(`Successfully added person #${newPerson.id}: ${newPerson.firstName} ${newPerson.lastName}`);
-			res.redirect(`/`);
+			res.redirect(`/persons`);
 		});
 	} else {
 		console.log(`ERROR: Received invalid values for adding person`);
@@ -101,7 +125,7 @@ app.get(`/update`, async (req, res) => {
 		res.render(`update`, {
 			data: person,
 			title: `Update | Persons`,
-		});	
+		});
 	} catch (error) {
 		console.log(`ERROR: ${error}`);
 		res.status(400).render(`error`, { errorMessage: error });
@@ -134,7 +158,7 @@ app.post(`/update`, async (req, res) => {
 		}
 
 		console.log(`Successfully updated person #${req.body.id}`);
-		res.redirect(`/`);
+		res.redirect(`/persons`);
 	} catch (error) {
 		console.log(`ERROR: ${error}`);
 		res.status(400).render(`error`, { errorMessage: error });
@@ -155,7 +179,7 @@ app.get(`/delete`, async (req, res) => {
 		await Person.destroy({ where: { id: req.query.id } });
 
 		console.log(`Successfully deleted person ${req.query.id}`);
-		res.redirect(`/`);
+		res.redirect(`/persons`);
 	} catch (error) {
 		console.log(`ERROR: ${error}`);
 		res.status(400).render(`error`, {
