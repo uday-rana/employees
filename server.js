@@ -64,7 +64,9 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-	res.render(`index.hbs`);
+	res.render(`index.hbs`, {
+		title: `Home | Persons`,
+	});
 });
 
 app.get(`/persons`, (req, res) => {
@@ -74,13 +76,14 @@ app.get(`/persons`, (req, res) => {
 			res.render(`persons`, {
 				data: data,
 				showReturnToTop: data.length > 10,
-				title: `Home | Persons`,
+				title: `Your Persons | Persons`,
 			});
 		})
 		.catch((error) => {
 			console.log(`ERROR: ${error}`);
 			res.status(400).render(`error`, {
 				errorMessage: `Sort parameter must be an existing column. Please try again.`,
+				title: `Error | Persons`
 			});
 		});
 });
@@ -107,6 +110,7 @@ app.post(`/add`, (req, res) => {
 		console.log(`ERROR: Received invalid values for adding person`);
 		res.status(403).render(`error`, {
 			errorMessage: `Received invalid values for adding person. Please try again.`,
+			title: `Error | Persons`
 		});
 	}
 });
@@ -128,7 +132,8 @@ app.get(`/update`, async (req, res) => {
 		});
 	} catch (error) {
 		console.log(`ERROR: ${error}`);
-		res.status(400).render(`error`, { errorMessage: error });
+		res.status(400).render(`error`, { errorMessage: error,
+			title: `Error | Persons` });
 	}
 });
 
@@ -161,7 +166,8 @@ app.post(`/update`, async (req, res) => {
 		res.redirect(`/persons`);
 	} catch (error) {
 		console.log(`ERROR: ${error}`);
-		res.status(400).render(`error`, { errorMessage: error });
+		res.status(400).render(`error`, { errorMessage: error,
+			title: `Error | Persons` });
 	}
 });
 
@@ -184,6 +190,7 @@ app.get(`/delete`, async (req, res) => {
 		console.log(`ERROR: ${error}`);
 		res.status(400).render(`error`, {
 			errorMessage: err,
+			title: `Error | Persons`
 		});
 	}
 });
@@ -191,6 +198,7 @@ app.get(`/delete`, async (req, res) => {
 app.use((req, res) => {
 	res.status(404).render(`error`, {
 		errorMessage: `Page not found :/`,
+		title: `Error | Persons`
 	});
 });
 
