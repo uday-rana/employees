@@ -12,6 +12,3 @@ Web application which allows users to add, update, delete, and view employees in
 - PostgreSQL
 - Bootstrap
 - CSS
-
-#### TODO:
-- Add search feature
