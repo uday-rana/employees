@@ -9,7 +9,7 @@ Web application which allows users to add, update, delete, and view employees in
 ## TODO
 See Issues.
 
-## Tools used:
+## Tools Used
 - Node
 - Express
 - Handlebars
