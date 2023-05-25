@@ -13,7 +13,6 @@ See Issues.
 - [Node.js](https://nodejs.org/en/)
 - [Express.js](https://expressjs.com/)
 - [PostgreSQL](https://https//www.postgresql.org/)
-- [MongoDB](https://www.mongodb.com/)
 - [Handlebars](https://handlebarsjs.com/)
 - [Bootstrap](https://getbootstrap.com/)
 - [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
