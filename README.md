@@ -1,4 +1,4 @@
-# persons
+# Persons
 Web application which allows users to add, update, delete, and view employees in a database. Features strong client-side and server-side validation for all data types.
 
 ## Sort
